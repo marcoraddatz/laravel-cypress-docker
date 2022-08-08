@@ -34,7 +34,7 @@ RUN apt-get update && \
   curl \
   libgtk-3-0 \
   lsb-release \
-  default-mysql-client \
+  #default-mysql-client \
   openssh-client \
   poppler-utils \
   rsync \
@@ -70,6 +70,9 @@ RUN apt-get update && \
   php8.1-zip \
   && php -m \
   && php -v
+
+# Remove system MySQL
+RUN apt-get remove --purge 'mysql-.*'
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
