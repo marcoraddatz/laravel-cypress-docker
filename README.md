@@ -55,7 +55,8 @@ jobs:
           npx cypress run
 ```
 
-## Preparation
+## Installation
 - Adjust the `.env` settings in the job
 - Change the host for `php artisan serve` to your `APP_URL` settings
 - Ensure that the host matches with the one from the Cypress config
+- `DB_HOST` must be `mysql`
