@@ -44,19 +44,52 @@ jobs:
       - name: Compile NPM
         run: npm run prod
 
+      - name: Update hosts file
+        run: |
+          echo "127.0.0.1 example.test" | tee -a /etc/hosts
+
       - name: Run Cypress
         env:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
         run: |
+          # Avoid Cypress exceptions through re-install: https://github.com/cypress-io/cypress/issues/5440#issuecomment-547851042
+          npx cypress install --force
           chmod -R 0777 public
-          cp .env.ci .env.testing
+          cp .env.cypress .env
           php artisan key:generate
-          php artisan serve --port=80 --env=testing --host=localhost  &> /dev/null &
+          php artisan serve --port=80 --host=example.test  &> /dev/null &
           npx cypress run
 ```
 
 ## Installation
-- Adjust the `.env` settings in the job
 - Change the host for `php artisan serve` to your `APP_URL` settings
-- Ensure that the host matches with the one from the Cypress config
-- `DB_HOST` must be `mysql`
+- Ensure that the host matches with the one from the Cypress config (replace `example.test`)
+
+### Sample `.env.cypress`
+
+```
+APP_NAME=Cypress
+APP_ENV=testing
+APP_KEY=
+APP_DEBUG=true
+APP_URL=http://example.test
+
+LOG_CHANNEL=stack
+
+FILESYSTEM_CLOUD=local
+
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_DATABASE=testing
+DB_USERNAME=user
+DB_PASSWORD=password
+DB_PORT=3306
+
+BROADCAST_DRIVER=log
+CACHE_DRIVER=file
+QUEUE_CONNECTION=sync
+SESSION_DRIVER=file
+SESSION_LIFETIME=120
+
+MAIL_MAILER=array
+```
