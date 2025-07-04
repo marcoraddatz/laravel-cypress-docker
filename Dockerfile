@@ -1,8 +1,17 @@
 # Sources:
-# https://github.com/cypress-io/cypress-docker-images/tree/master/browsers/node16.14.2-slim-chrome103-ff102
+# https://github.com/cypress-io/cypress-docker-images
 # https://github.com/lbausch/laravel-ci/blob/master/Dockerfile
 
-FROM cypress/base:16.14.2-slim
+# Use cypress/included as base image
+FROM cypress/included:latest
+
+# Define build arguments with default values from environment variables
+ARG NODE_VERSION=${NODE_VERSION:-22.17.0}
+ARG PHP_VERSION=${PHP_VERSION:-8.3}
+
+# Set environment variables from build arguments
+ENV NODE_VERSION=${NODE_VERSION} \
+    PHP_VERSION=${PHP_VERSION}
 
 USER root
 
@@ -11,9 +20,9 @@ RUN node --version
 COPY ./global-profile.sh /tmp/global-profile.sh
 RUN cat /tmp/global-profile.sh >> /etc/bash.bashrc && rm /tmp/global-profile.sh
 
-# Install Cypress dependencies
 RUN apt-get update && \
   apt-get install -y \
+  # Install Cypress dependencies
   fonts-liberation \
   git \
   libcurl4 \
@@ -22,9 +31,9 @@ RUN apt-get update && \
   xdg-utils \
   wget \
   curl \
-  # firefox dependencies
+  # Firefox dependencies
   bzip2 \
-  # add codecs needed for video playback in firefox
+  # Add codecs needed for video playback in Firefox
   # https://github.com/cypress-io/cypress-docker-images/issues/150
   mplayer \
   \
@@ -47,22 +56,22 @@ RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 RUN apt-get update && \
   apt-get install -y \
   php-redis \
-  php8.1-bcmath \
-  php8.1-cli \
-  php8.1-curl \
-  php8.1-dom \
-  php8.1-fpm \
-  php8.1-gd \
-  php8.1-imap \
-  php8.1-intl \
-  php8.1-ldap \
-  php8.1-mbstring \
-  php8.1-mysql \
-  php8.1-soap \
-  php8.1-sqlite \
-  php8.1-tidy \
-  php8.1-xdebug \
-  php8.1-zip \
+  php${PHP_VERSION}-bcmath \
+  php${PHP_VERSION}-cli \
+  php${PHP_VERSION}-curl \
+  php${PHP_VERSION}-dom \
+  php${PHP_VERSION}-fpm \
+  php${PHP_VERSION}-gd \
+  php${PHP_VERSION}-imap \
+  php${PHP_VERSION}-intl \
+  php${PHP_VERSION}-ldap \
+  php${PHP_VERSION}-mbstring \
+  php${PHP_VERSION}-mysql \
+  php${PHP_VERSION}-soap \
+  php${PHP_VERSION}-sqlite3 \
+  php${PHP_VERSION}-tidy \
+  php${PHP_VERSION}-xdebug \
+  php${PHP_VERSION}-zip \
   && php -m \
   && php -v
 
@@ -73,37 +82,16 @@ RUN apt-get remove --purge 'mysql-.*'
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 RUN composer self-update && composer --version
 
-# Install libappindicator3-1 - not included with Debian 11
-RUN wget --no-verbose /usr/src/libappindicator3-1_0.4.92-7_amd64.deb "http://ftp.us.debian.org/debian/pool/main/liba/libappindicator/libappindicator3-1_0.4.92-7_amd64.deb" && \
-  dpkg -i /usr/src/libappindicator3-1_0.4.92-7_amd64.deb ; \
-  apt-get install -f -y && \
-  rm -f /usr/src/libappindicator3-1_0.4.92-7_amd64.deb
-
-# Install Chrome browser
-RUN node -p "process.arch === 'arm64' ? 'Not downloading Chrome since we are on arm64: https://crbug.com/677140' : process.exit(1)" || \
-  (wget --no-verbose -O /usr/src/google-chrome-stable_current_amd64.deb "http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_103.0.5060.53-1_amd64.deb" && \
-  dpkg -i /usr/src/google-chrome-stable_current_amd64.deb ; \
-  apt-get install -f -y && \
-  rm -f /usr/src/google-chrome-stable_current_amd64.deb)
-
+# Browsers (Chrome and Firefox) are already included in cypress/included image
 # "fake" dbus address to prevent errors
 # https://github.com/SeleniumHQ/docker-selenium/issues/87
 ENV DBUS_SESSION_BUS_ADDRESS=/dev/null
 
-# Install Firefox browser
-RUN node -p "process.arch === 'arm64' ? 'Not downloading Firefox since we are on arm64: https://bugzilla.mozilla.org/show_bug.cgi?id=1678342' : process.exit(1)" || \
-  (wget --no-verbose -O /tmp/firefox.tar.bz2 https://download-installer.cdn.mozilla.net/pub/firefox/releases/102.0.1/linux-x86_64/en-US/firefox-102.0.1.tar.bz2 && \
-  tar -C /opt -xjf /tmp/firefox.tar.bz2 && \
-  rm /tmp/firefox.tar.bz2 && \
-  ln -fs /opt/firefox/firefox /usr/bin/firefox)
-
 # Install Browsershot dependencies
 # https://spatie.be/docs/browsershot/v2/requirements#content-installing-puppeteer-a-forge-provisioned-server
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash
-
+# Most dependencies are already included in cypress/included
 RUN apt-get update && \
   apt-get install -y \
-  nodejs \
   gconf-service \
   libasound2 \
   libatk1.0-0 \
@@ -144,8 +132,11 @@ RUN apt-get update && \
   xdg-utils \
   wget
 
+# Install Puppeteer with the Chrome that comes with Cypress
 RUN npm install --location=global --unsafe-perm puppeteer
-RUN chmod -R o+rx /usr/lib/node_modules/puppeteer/.local-chromium
+# Ensure the puppeteer cache directory is accessible
+RUN mkdir -p /root/.cache/puppeteer && \
+  chmod -R o+rx /root/.cache
 
 # Cleanup
 RUN rm -rf /var/lib/apt/lists/* \
@@ -158,14 +149,18 @@ RUN echo  " node version:    $(node -v) \n" \
   "debian version:  $(cat /etc/debian_version) \n" \
   "Chrome version:  $(google-chrome --version) \n" \
   "Firefox version: $(firefox --version) \n" \
-  "Edge version:    n/a \n" \
   "git version:     $(git --version) \n" \
   "whoami:          $(whoami) \n"
 
-# a few environment variables to make NPM installs easier
-# good colors for most applications
+# A few environment variables to make NPM installs easier
+# Good colors for most applications
 ENV TERM=xterm
-# avoid million NPM install messages
+# Avoid million NPM install messages
 ENV npm_config_loglevel=warn
-# allow installing when the main user is root
+# Allow installing when the main user is root
 ENV npm_config_unsafe_perm=true
+
+# Copy and set the entrypoint
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["cypress", "run"]
