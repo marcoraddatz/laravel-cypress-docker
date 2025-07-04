@@ -55,7 +55,7 @@ RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
 # Install PHP
 RUN apt-get update && \
   apt-get install -y \
-  php-redis \
+  php${PHP_VERSION}-redis \
   php${PHP_VERSION}-bcmath \
   php${PHP_VERSION}-cli \
   php${PHP_VERSION}-curl \

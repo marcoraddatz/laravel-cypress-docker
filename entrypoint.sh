@@ -14,7 +14,15 @@ echo "PHP: $(php -v | head -n 1)"
 echo "Composer: $(composer --version)"
 
 # Test Browsers
-echo "Chrome: $(google-chrome --version)"
+# Chrome is typically installed in /opt/google/chrome in cypress/included
+if [ -f "/opt/google/chrome/chrome" ]; then
+  echo "Chrome: $(/opt/google/chrome/chrome --version)"
+else
+  echo "Chrome: Not found in /opt/google/chrome/chrome"
+  echo "Trying to find Chrome..."
+  find / -name chrome -type f -executable 2>/dev/null | grep -v "snap" | head -n 1 | xargs -I{} sh -c 'echo "Chrome: $({} --version)"' || echo "Chrome not found"
+fi
+
 echo "Firefox: $(firefox --version)"
 
 echo "=== All tests completed successfully ==="
