@@ -12,13 +12,11 @@ fi
 DOCKER_HUB_USERNAME="${DOCKER_HUB_USERNAME:-marcoraddatz}"
 REPO_NAME="${REPO_NAME:-laravel-cypress-docker}"
 
-# Create version-specific tag with minor versions (e.g., php-8.3-node-22.17)
-VERSION_TAG="php-${PHP_VERSION}-node-${NODE_VERSION}"
+# Create short tag (e.g., php8.3-node22)
 SHORT_TAG="php${PHP_VERSION}-node$(echo $NODE_VERSION | cut -d. -f1)"
 
 # Set image names
 LATEST_IMAGE_NAME="$DOCKER_HUB_USERNAME/$REPO_NAME:latest"
-VERSIONED_IMAGE_NAME="$DOCKER_HUB_USERNAME/$REPO_NAME:$VERSION_TAG"
 SHORT_TAG_IMAGE_NAME="$DOCKER_HUB_USERNAME/$REPO_NAME:$SHORT_TAG"
 
 # Build the image with version arguments
@@ -46,14 +44,12 @@ fi
 # Build for both AMD64 and ARM64
 echo "Building multi-architecture images..."
 echo "- Tag: latest (${LATEST_IMAGE_NAME})"
-echo "- Tag: ${VERSION_TAG} (${VERSIONED_IMAGE_NAME})"
 echo "- Tag: ${SHORT_TAG} (${SHORT_TAG_IMAGE_NAME})"
 
 docker buildx build --platform linux/amd64,linux/arm64 \
   --build-arg PHP_VERSION="$PHP_VERSION" \
   --build-arg NODE_VERSION="$NODE_VERSION" \
   -t "$LATEST_IMAGE_NAME" \
-  -t "$VERSIONED_IMAGE_NAME" \
   -t "$SHORT_TAG_IMAGE_NAME" \
   --push \
   .
@@ -61,7 +57,6 @@ docker buildx build --platform linux/amd64,linux/arm64 \
 echo "\n✅ Successfully built and pushed multi-architecture images to Docker Hub!"
 echo "📦 Images:"
 echo "  - $LATEST_IMAGE_NAME (latest)"
-echo "  - $VERSIONED_IMAGE_NAME (full version)"
 echo "  - $SHORT_TAG_IMAGE_NAME (short version)"
 echo "📌 Platforms for each tag:"
 echo "  - linux/amd64 (GitHub Actions runners)"
