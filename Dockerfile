@@ -15,11 +15,15 @@ ENV NODE_VERSION=${NODE_VERSION} \
 
 USER root
 
+# Suppress debconf warnings during package installation
+# This prevents "unable to initialize frontend: Dialog" warnings
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN node --version
 
 # Install system dependencies
-RUN apt-get update && \
-  apt-get install -y --no-install-recommends \
+RUN apt-get update -qq && \
+  apt-get install -y --no-install-recommends -qq \
   # Install Cypress dependencies
   fonts-liberation \
   git \
@@ -51,8 +55,8 @@ RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
   echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
 
 # Install PHP with all extensions
-RUN apt-get update && \
-  apt-get install -y --no-install-recommends \
+RUN apt-get update -qq && \
+  apt-get install -y --no-install-recommends -qq \
   php${PHP_VERSION}-redis \
   php${PHP_VERSION}-bcmath \
   php${PHP_VERSION}-cli \
@@ -89,8 +93,8 @@ ENV DBUS_SESSION_BUS_ADDRESS=/dev/null
 
 # Install Browsershot dependencies (updated for Debian 13 with t64 packages)
 # https://spatie.be/docs/browsershot/v2/requirements#content-installing-puppeteer-a-forge-provisioned-server
-RUN apt-get update && \
-  apt-get install -y --no-install-recommends \
+RUN apt-get update -qq && \
+  apt-get install -y --no-install-recommends -qq \
   # Core Browsershot/Puppeteer dependencies (from latest docs)
   libx11-xcb1 \
   libxcomposite1 \
