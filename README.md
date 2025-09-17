@@ -1,10 +1,12 @@
 # Laravel-Cypress-Docker
 
-This image is built on the official [Cypress Docker image](https://github.com/cypress-io/cypress-docker-images/tree/master/browsers/node16.14.2-slim-chrome103-ff102), and another [Laravel CI package](https://github.com/lbausch/laravel-ci/blob/master/Dockerfile), and works with AMD64.
+This image is built on the official [Cypress Docker image](https://github.com/cypress-io/cypress-docker-images/tree/master/browsers/node16.14.2-slim-chrome103-ff102), and another [Laravel CI package](https://github.com/lbausch/laravel-ci/blob/master/Dockerfile), and works with both AMD64 and ARM64.
 
-It's a complete image with all operating system dependencies for Cypress, Chrome 103.0.5060.53, Firefox 102.0.1, and Edge undefined browsers. Also, it ships with PHP 8.1, Composer 2, Node.js 16 and NPM 8.
+It's a complete image with all operating system dependencies for Cypress, Chrome, and Firefox browsers. Also, it ships with PHP 8.3, Composer 2, Node.js 22 and NPM 10.
 
 I'm not very good at maintaining open source projects, so please don't build critical infrastructure on this project.
+
+## Build
 
 ## Example GitHub workflow
 
