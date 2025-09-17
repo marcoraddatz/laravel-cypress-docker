@@ -3,6 +3,7 @@
 This image is built on the official [Cypress Docker image](https://hub.docker.com/r/cypress/included/), and another [Laravel CI package](https://github.com/lbausch/laravel-ci/blob/master/Dockerfile), and works with both AMD64 and ARM64.
 
 It's a complete image with all operating system dependencies for Cypress, Chrome, and Firefox browsers.
+**Note:** On ARM64, only Firefox is available due to [this issue](https://github.com/cypress-io/cypress-docker-images/issues/695#issuecomment-2282696415).
 
 > I'm not very good at maintaining open source projects, so please don't build critical infrastructure on this project!
 
