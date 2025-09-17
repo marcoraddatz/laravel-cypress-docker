@@ -9,21 +9,14 @@ else
     exit 1
 fi
 
-DOCKER_HUB_USERNAME="${DOCKER_HUB_USERNAME:-marcoraddatz}"
-REPO_NAME="${REPO_NAME:-laravel-cypress-docker}"
-
 # Create version-specific tag with minor versions (e.g., php-8.3-node-22.17)
 VERSION_TAG="php-${PHP_VERSION}-node-${NODE_VERSION}"
-SHORT_TAG="php$(echo $PHP_VERSION | cut -d. -f1)-node$(echo $NODE_VERSION | cut -d. -f1)"
+SHORT_TAG="php${PHP_VERSION}-node$(echo $NODE_VERSION | cut -d. -f1)"
 
 # Set image names
 LATEST_IMAGE_NAME="$DOCKER_HUB_USERNAME/$REPO_NAME:latest"
 VERSIONED_IMAGE_NAME="$DOCKER_HUB_USERNAME/$REPO_NAME:$VERSION_TAG"
 SHORT_TAG_IMAGE_NAME="$DOCKER_HUB_USERNAME/$REPO_NAME:$SHORT_TAG"
-
-# Ensure required variables are set
-PHP_VERSION=${PHP_VERSION:-8.3}
-NODE_VERSION=${NODE_VERSION:-22.17.0}
 
 # Build the image with version arguments
 echo "Building images with:"
