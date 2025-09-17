@@ -9,6 +9,9 @@ else
     exit 1
 fi
 
+DOCKER_HUB_USERNAME="${DOCKER_HUB_USERNAME:-marcoraddatz}"
+REPO_NAME="${REPO_NAME:-laravel-cypress-docker}"
+
 # Create version-specific tag with minor versions (e.g., php-8.3-node-22.17)
 VERSION_TAG="php-${PHP_VERSION}-node-${NODE_VERSION}"
 SHORT_TAG="php${PHP_VERSION}-node$(echo $NODE_VERSION | cut -d. -f1)"

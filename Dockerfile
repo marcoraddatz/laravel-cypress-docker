@@ -20,14 +20,14 @@ RUN node --version
 COPY ./global-profile.sh /tmp/global-profile.sh
 RUN cat /tmp/global-profile.sh >> /etc/bash.bashrc && rm /tmp/global-profile.sh
 
+# Install system dependencies
 RUN apt-get update && \
-  apt-get install -y \
+  apt-get install -y --no-install-recommends \
   # Install Cypress dependencies
   fonts-liberation \
   git \
-  libcurl4 \
-  libcurl3-gnutls \
-  libcurl3-nss \
+  libcurl4t64 \
+  libcurl3t64-gnutls \
   xdg-utils \
   wget \
   curl \
@@ -40,21 +40,22 @@ RUN apt-get update && \
   # Additional packages for PHP/Laravel
   build-essential \
   ca-certificates \
-  curl \
   libgtk-3-0 \
   lsb-release \
   openssh-client \
   poppler-utils \
   rsync \
-  supervisor
+  supervisor \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
 # Add key and repository
 RUN wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg && \
   echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list
 
-# Install PHP
+# Install PHP with all extensions
 RUN apt-get update && \
-  apt-get install -y \
+  apt-get install -y --no-install-recommends \
   php${PHP_VERSION}-redis \
   php${PHP_VERSION}-bcmath \
   php${PHP_VERSION}-cli \
@@ -73,10 +74,12 @@ RUN apt-get update && \
   php${PHP_VERSION}-xdebug \
   php${PHP_VERSION}-zip \
   && php -m \
-  && php -v
+  && php -v \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
-# Remove system MySQL
-RUN apt-get remove --purge 'mysql-.*'
+# Remove system MySQL (if any)
+RUN apt-get remove --purge 'mysql-.*' || true
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
@@ -87,34 +90,31 @@ RUN composer self-update && composer --version
 # https://github.com/SeleniumHQ/docker-selenium/issues/87
 ENV DBUS_SESSION_BUS_ADDRESS=/dev/null
 
-# Install Browsershot dependencies
+# Install Browsershot dependencies (updated for Debian 13 with t64 packages)
 # https://spatie.be/docs/browsershot/v2/requirements#content-installing-puppeteer-a-forge-provisioned-server
-# Most dependencies are already included in cypress/included
 RUN apt-get update && \
-  apt-get install -y \
-  gconf-service \
-  libasound2 \
-  libatk1.0-0 \
-  libc6 \
+  apt-get install -y --no-install-recommends \
+  # Core Browsershot/Puppeteer dependencies (from latest docs)
+  libx11-xcb1 \
+  libxcomposite1 \
+  libasound2t64 \
+  libatk1.0-0t64 \
+  libatk-bridge2.0-0 \
   libcairo2 \
-  libcups2 \
+  libcups2t64 \
   libdbus-1-3 \
   libexpat1 \
   libfontconfig1 \
   libgbm1 \
-  libgcc1 \
-  libgconf-2-4 \
-  libgdk-pixbuf2.0-0 \
-  libglib2.0-0 \
-  libgtk-3-0 \
+  libgcc-s1 \
+  libglib2.0-0t64 \
+  libgtk-3-0t64 \
   libnspr4 \
   libpango-1.0-0 \
   libpangocairo-1.0-0 \
   libstdc++6 \
   libx11-6 \
-  libx11-xcb1 \
   libxcb1 \
-  libxcomposite1 \
   libxcursor1 \
   libxdamage1 \
   libxext6 \
@@ -124,23 +124,27 @@ RUN apt-get update && \
   libxrender1 \
   libxss1 \
   libxtst6 \
+  # Additional system packages
   ca-certificates \
   fonts-liberation \
-  libappindicator1 \
   libnss3 \
   lsb-release \
   xdg-utils \
-  wget
+  wget \
+  && apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
 
-# Install Puppeteer with the Chrome that comes with Cypress
+# Install Puppeteer and Chrome (following latest Browsershot docs)
 RUN npm install --location=global --unsafe-perm puppeteer
+
+# Install Chrome through Puppeteer (as per latest docs)
+RUN npx puppeteer browsers install chrome
+
 # Ensure the puppeteer cache directory is accessible
 RUN mkdir -p /root/.cache/puppeteer && \
   chmod -R o+rx /root/.cache
 
-# Cleanup
-RUN rm -rf /var/lib/apt/lists/* \
-  && apt-get clean
+# Final cleanup (redundant cleanup removed as it's now done in each apt install)
 
 # versions of local tools
 RUN echo  " node version:    $(node -v) \n" \
