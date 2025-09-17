@@ -1,10 +1,40 @@
 # Laravel-Cypress-Docker
 
-This image is built on the official [Cypress Docker image](https://github.com/cypress-io/cypress-docker-images/tree/master/browsers/node16.14.2-slim-chrome103-ff102), and another [Laravel CI package](https://github.com/lbausch/laravel-ci/blob/master/Dockerfile), and works with both AMD64 and ARM64.
+This image is built on the official [Cypress Docker image](https://hub.docker.com/r/cypress/included/), and another [Laravel CI package](https://github.com/lbausch/laravel-ci/blob/master/Dockerfile), and works with both AMD64 and ARM64.
 
-It's a complete image with all operating system dependencies for Cypress, Chrome, and Firefox browsers. Also, it ships with PHP 8.3, Composer 2, Node.js 22 and NPM 10.
+It's a complete image with all operating system dependencies for Cypress, Chrome, and Firefox browsers.
 
-I'm not very good at maintaining open source projects, so please don't build critical infrastructure on this project.
+> I'm not very good at maintaining open source projects, so please don't build critical infrastructure on this project!
+
+## Available Images
+
+The following PHP and Node.js combinations are available on [Docker Hub](https://hub.docker.com/r/marcoraddatz/laravel-cypress-docker/tags):
+
+| PHP Version | Node 24 | Node 22 | Node 20 |
+|-------------|---------|---------|---------|
+| **PHP 8.4** | `php8.4-node24` | `php8.4-node22` | `php8.4-node20` |
+| **PHP 8.3** | `php8.3-node24` | `php8.3-node22` | `php8.3-node20` |
+| **PHP 8.2** | `php8.2-node24` | `php8.2-node22` | `php8.2-node20` |
+
+### Usage Examples
+
+```bash
+# Use latest (PHP 8.4 + Node 24)
+docker pull marcoraddatz/laravel-cypress-docker:latest
+
+# Use specific PHP/Node combination
+docker pull marcoraddatz/laravel-cypress-docker:php8.3-node22
+
+# Use in Docker Compose
+image: marcoraddatz/laravel-cypress-docker:php8.3-node22
+```
+
+### Features Included
+
+- **PHP Extensions**: bcmath, curl, dom, gd, imap, intl, ldap, mbstring, mysql, redis, soap, sqlite3, tidy, xdebug, zip
+- **Browsershot Support**: Full Puppeteer v24+ and Chrome setup for PDF generation
+- **Testing Stack**: Cypress, Chrome, Firefox browsers
+- **Multi-platform**: AMD64 and ARM64 support
 
 ## Build
 
