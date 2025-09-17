@@ -17,9 +17,6 @@ USER root
 
 RUN node --version
 
-COPY ./global-profile.sh /tmp/global-profile.sh
-RUN cat /tmp/global-profile.sh >> /etc/bash.bashrc && rm /tmp/global-profile.sh
-
 # Install system dependencies
 RUN apt-get update && \
   apt-get install -y --no-install-recommends \
