@@ -5,8 +5,6 @@ This image is built on the official [Cypress Docker image](https://hub.docker.co
 It's a complete image with all operating system dependencies for Cypress, Chrome, and Firefox browsers.
 **Note:** On ARM64, only Firefox is available due to [this issue](https://github.com/cypress-io/cypress-docker-images/issues/695#issuecomment-2282696415).
 
-> I'm not very good at maintaining open source projects, so please don't build critical infrastructure on this project!
-
 ## Available Images
 
 The following PHP and Node.js combinations are available on [Docker Hub](https://hub.docker.com/r/marcoraddatz/laravel-cypress-docker/tags):
