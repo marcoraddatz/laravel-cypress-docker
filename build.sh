@@ -23,6 +23,7 @@ SHORT_TAG_IMAGE_NAME="$DOCKER_HUB_USERNAME/$REPO_NAME:$SHORT_TAG"
 echo "Building images with:"
 echo "- PHP: $PHP_VERSION"
 echo "- Node.js: $NODE_VERSION"
+echo "- MySQL: $MYSQL_VERSION"
 
 # Ensure Docker Buildx is available
 if ! docker buildx version &> /dev/null; then
@@ -49,6 +50,7 @@ echo "- Tag: ${SHORT_TAG} (${SHORT_TAG_IMAGE_NAME})"
 docker buildx build --platform linux/amd64,linux/arm64 \
   --build-arg PHP_VERSION="$PHP_VERSION" \
   --build-arg NODE_VERSION="$NODE_VERSION" \
+  --build-arg MYSQL_VERSION="$MYSQL_VERSION" \
   -t "$LATEST_IMAGE_NAME" \
   -t "$SHORT_TAG_IMAGE_NAME" \
   --push \

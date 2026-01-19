@@ -2,6 +2,7 @@ name: Build Docker Images
 
 env:
   REPO_NAME: laravel-cypress-docker
+  MYSQL_VERSION: 8.0
 
 on:
   schedule:
@@ -25,6 +26,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          # PHP 8.5 combinations
+          - php_version: "8.5"
+            node_version: "24"
+            is_latest: true
+          - php_version: "8.5"
+            node_version: "22"
+            is_latest: false
+          - php_version: "8.5"
+            node_version: "20"
+            is_latest: false
+
+
           # PHP 8.4 combinations
           - php_version: "8.4"
             node_version: "24"
@@ -76,6 +89,7 @@ jobs:
           cat > .env << EOF
           PHP_VERSION=${{ matrix.php_version }}
           NODE_VERSION=${{ matrix.node_version }}
+          MYSQL_VERSION=${{ env.MYSQL_VERSION }}
           DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_HUB_TOKEN=${{ secrets.DOCKER_HUB_TOKEN }}
           REPO_NAME=${{ env.REPO_NAME }}
@@ -89,6 +103,7 @@ jobs:
         env:
           PHP_VERSION: ${{ matrix.php_version }}
           NODE_VERSION: ${{ matrix.node_version }}
+          MYSQL_VERSION: ${{ env.MYSQL_VERSION }}
 
       - name: Test built image
         run: |
