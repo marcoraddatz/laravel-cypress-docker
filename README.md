@@ -13,6 +13,7 @@ The following PHP and Node.js combinations are available on [Docker Hub](https:/
 
 | PHP Version | Node 24 | Node 22 | Node 20 |
 |-------------|---------|---------|---------|
+| **PHP 8.5** | `php8.5-node24` | `php8.5-node22` | `php8.5-node20` |
 | **PHP 8.4** | `php8.4-node24` | `php8.4-node22` | `php8.4-node20` |
 | **PHP 8.3** | `php8.3-node24` | `php8.3-node22` | `php8.3-node20` |
 | **PHP 8.2** | `php8.2-node24` | `php8.2-node22` | `php8.2-node20` |
@@ -20,7 +21,7 @@ The following PHP and Node.js combinations are available on [Docker Hub](https:/
 ### Usage Examples
 
 ```bash
-# Use latest (PHP 8.4 + Node 24)
+# Use latest (PHP 8.5 + Node 24)
 docker pull marcoraddatz/laravel-cypress-docker:latest
 
 # Use specific PHP/Node combination
@@ -36,8 +37,17 @@ image: marcoraddatz/laravel-cypress-docker:php8.3-node22
 - **Browsershot Support**: Full Puppeteer v24+ and Chrome setup for PDF generation
 - **Testing Stack**: Cypress, Chrome, Firefox browsers
 - **Multi-platform**: AMD64 and ARM64 support
+- **Configurable Versions**: PHP, Node.js, and MySQL versions can be set via environment variables
 
-## Build
+## Configuration
+
+You can customize the versions by modifying the `.env` file:
+
+```bash
+PHP_VERSION=8.3      # PHP version (8.2, 8.3, 8.4, 8.5)
+NODE_VERSION=22.17.0 # Node.js version
+MYSQL_VERSION=8.0    # MySQL version (used in CI examples)
+```
 
 ## Example GitHub workflow
 
@@ -54,7 +64,7 @@ jobs:
       image: marcoraddatz/laravel-cypress-docker:latest
     services:
       mysql:
-        image: mysql:8.0
+        image: mysql:8.0  # You can change this version in your .env file
         # https://owenconti.com/posts/failing-to-start-mysql-inside-github-actions
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes

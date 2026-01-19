@@ -8,10 +8,12 @@ FROM cypress/included:latest
 # Define build arguments with default values from environment variables
 ARG NODE_VERSION=${NODE_VERSION:-22.17.0}
 ARG PHP_VERSION=${PHP_VERSION:-8.3}
+ARG MYSQL_VERSION=${MYSQL_VERSION:-8.0}
 
 # Set environment variables from build arguments
 ENV NODE_VERSION=${NODE_VERSION} \
-    PHP_VERSION=${PHP_VERSION}
+    PHP_VERSION=${PHP_VERSION} \
+    MYSQL_VERSION=${MYSQL_VERSION}
 
 USER root
 
